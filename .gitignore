@@ -1,0 +1,11 @@
+target
+.idea/
+.idea_modules
+.classpath
+.project
+.settings
+*.iml
+*.sc
+target/
+logs/
+.history
