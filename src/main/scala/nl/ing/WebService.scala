@@ -1,22 +1,18 @@
 package nl.ing
 
-import java.nio.file.Paths
-
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import akka.stream.scaladsl.{FileIO, Framing, Sink}
+import akka.stream.scaladsl.Sink
 import akka.util.ByteString
+import nl.TextRecognition2
+import nl.ing.model._
 
 import scala.concurrent.Future
 import scala.io.StdIn
-import model._
-import nl.TextRecognition2
-
-import scala.util.{Failure, Success}
 
 object WebServer {
   def main(args: Array[String]) {
@@ -61,6 +57,13 @@ object WebServer {
                 complete(s"Successfully written ${listOfBytes.size} bytes")
               }
           }
+        } ~
+        pathPrefix("getTransactions" / IntNumber / IntNumber) {
+          case (offset, size) =>
+            val eventualAccountOverview = fetchTransactions(offset, size)
+            onSuccess(eventualAccountOverview) { accountOverview =>
+              complete(accountOverview)
+            }
         }
 
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
