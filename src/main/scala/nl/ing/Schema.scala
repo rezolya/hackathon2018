@@ -1,11 +1,13 @@
 package nl.ing
 
 
-case class vertices(topRight: Int, topLeft: Int, bottomRight: Int, bottomLeft: Int)
-case class item(name: String,coordinate: vertices )
+case class Vector(x: Int, y: Int)
+case class Square(topRight: Vector, topLeft: Vector, bottomRight: Vector, bottomLeft: Vector) {
 
-class Schema(item : Seq[item]) {
+  val middle: Vector = ???
 
-
-
+  def isOnSameLine(otherSquare: Square): Boolean = ???
 }
+case class Item(name: String, coordinate: Square)
+
+case class Schema(item : Seq[Item])
