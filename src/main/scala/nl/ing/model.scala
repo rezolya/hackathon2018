@@ -1,10 +1,7 @@
 package nl.ing
 
-import java.time.{ZoneId, ZonedDateTime}
-import java.time.format.DateTimeFormatter
+import java.time.ZonedDateTime
 
-import akka.Done
-import spray.json.{DefaultJsonProtocol, JsString, JsValue, RootJsonFormat}
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -12,10 +9,6 @@ import scala.concurrent.{ExecutionContext, Future}
 object model {
 
   var receipts: List[Seq[Byte]] = List.empty
-
-  var orders: List[Item] = List(
-    Item("brood", 1)
-  )
 
   val transactions: List[Transaction] = List(
     Transaction(Account("Etos", "1234"),
@@ -42,9 +35,9 @@ object model {
   ).sortBy(x => x.timestamp)
 
   // domain model
-  final case class Item(name: String, id: Long)
+  final case class Item(name: String, price: Float)
 
-  final case class Order(items: List[Item])
+  final case class Receipt(shopName: String, totalTransactionAmount: Float, items: List[Item])
 
   final case class Account(name: String, number: String)
 
@@ -57,28 +50,10 @@ object model {
 
   // formats for unmarshalling and marshalling
   implicit val itemFormat = jsonFormat2(Item)
-  implicit val orderFormat = jsonFormat1(Order)
+  implicit val orderFormat = jsonFormat3(Receipt)
   implicit val accountFormat = jsonFormat2(Account)
   implicit val transactionFormat = jsonFormat3(Transaction)
   implicit val accountOverviewFormat = jsonFormat2(AccountOverview)
-
-  // (fake) async database query api
-  def fetchItem(itemId: Long)(
-    implicit executionContext: ExecutionContext): Future[Option[Item]] =
-    Future {
-      orders.find(o => o.id == itemId)
-    }
-
-  def saveOrder(order: Order)(
-    implicit executionContext: ExecutionContext): Future[Done] = {
-    orders = order match {
-      case Order(items) => items ::: orders
-      case _ => orders
-    }
-    Future {
-      Done
-    }
-  }
 
   def fetchTransactions(offset: Int, size: Int)(
     implicit executionContext: ExecutionContext): Future[AccountOverview] =

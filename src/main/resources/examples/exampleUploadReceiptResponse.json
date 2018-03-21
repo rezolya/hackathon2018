@@ -1,0 +1,18 @@
+{
+  "shopName" : "AHTogo",
+  "totalTransactionAmount" : 19.99,
+  "items" : [
+    {
+      "item" : "BonBons",
+      "price" : 10.00
+    },
+    {
+      "item" : "Appels",
+      "price" : 5.00
+    },
+    {
+      "item" : "Pepermunt ballen",
+      "price" : 4.99
+    }
+  ]
+}
