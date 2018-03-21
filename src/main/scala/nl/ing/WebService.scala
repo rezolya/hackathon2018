@@ -1,9 +1,11 @@
 package nl.ing
 
 import akka.actor.ActorSystem
+import akka.http.javadsl.model.headers.RawHeader
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
-import akka.http.scaladsl.model._
+import akka.http.scaladsl.model.{headers, _}
+import akka.http.scaladsl.model.headers.RawHeader
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
@@ -14,6 +16,7 @@ import nl.ing.model._
 import scala.io.StdIn
 
 object WebServer {
+
   def main(args: Array[String]) {
 
     implicit val system = ActorSystem("my-system")
@@ -22,40 +25,45 @@ object WebServer {
     implicit val executionContext = system.dispatcher
 
     val route =
-      get {
-        path("hello") {
-          complete(
-            HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                       "<h1>Say hello to akka-http</h1>"))
-        }
-      } ~
-    //upload receipt endpoint.
-        path("uploadReceipt") {
-          fileUpload("receipt") {
-            case (metadata, byteSource) =>
-//                val sink = FileIO.toPath(Paths.get("/tmp") resolve metadata.fileName)
-              val sink = Sink.fold[ByteString, ByteString](ByteString.empty) {
-                case (acc: ByteString, chunk: ByteString) => acc ++ chunk
-              }
-              val writeResult = byteSource.runWith(sink)
-              onSuccess(writeResult) { result =>
-                val listOfBytes = result.toList
-
-                TextRecognition2.detectDocumentText(listOfBytes)
-
-                receipts = receipts :+ listOfBytes
-
-                val stubbedReceipt = Receipt("AHTogo", 19.99F, List(Item("BonBons", 10.00F), Item("Appels", 5.00F), Item("Pepermunt ballen", 4.99F)))
-                complete(stubbedReceipt)
-              }
+      respondWithHeaders(headers.RawHeader("Access-Control-Allow-Origin", "*"),
+        headers.RawHeader("Access-Control-Allow-Methods", "Get, POST"),
+        headers.RawHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")) {
+        get {
+          path("hello") {
+            complete(
+              HttpEntity(ContentTypes.`text/html(UTF-8)`,
+                "<h1>Say hello to akka-http</h1>"))
           }
         } ~
-    //get transactions endpoint.
-        pathPrefix("getTransactions" / IntNumber / IntNumber) {
-          case (offset, size) =>
-            val eventualAccountOverview = fetchTransactions(offset, size)
-            onSuccess(eventualAccountOverview) { accountOverview =>
-              complete(accountOverview)
+          //upload receipt endpoint.
+          path("uploadReceipt") {
+
+            fileUpload("receipt") {
+              case (metadata, byteSource) =>
+                //                val sink = FileIO.toPath(Paths.get("/tmp") resolve metadata.fileName)
+                val sink = Sink.fold[ByteString, ByteString](ByteString.empty) {
+                  case (acc: ByteString, chunk: ByteString) => acc ++ chunk
+                }
+                val writeResult = byteSource.runWith(sink)
+                onSuccess(writeResult) { result =>
+                  val listOfBytes = result.toList
+
+                  TextRecognition2.detectDocumentText(listOfBytes)
+
+                  receipts = receipts :+ listOfBytes
+
+                  val stubbedReceipt = Receipt("AHTogo", 19.99F, List(Item("BonBons", 10.00F), Item("Appels", 5.00F), Item("Pepermunt ballen", 4.99F)))
+                  complete(stubbedReceipt)
+                }
+            }
+          } ~
+            //get transactions endpoint.
+            pathPrefix("getTransactions" / IntNumber / IntNumber) {
+              case (offset, size) =>
+                val eventualAccountOverview = fetchTransactions(offset, size)
+                onSuccess(eventualAccountOverview) { accountOverview =>
+                  complete(accountOverview)
+                }
             }
         }
 
