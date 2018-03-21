@@ -45,7 +45,8 @@ object WebServer {
 
                 receipts = receipts :+ listOfBytes
 
-                complete(s"Successfully written ${listOfBytes.size} bytes")
+                val stubbedReceipt = Receipt("AHTogo", 19.99F, List(Item("BonBons", 10.00F), Item("Appels", 5.00F), Item("Pepermunt ballen", 4.99F)))
+                complete(stubbedReceipt)
               }
           }
         } ~
