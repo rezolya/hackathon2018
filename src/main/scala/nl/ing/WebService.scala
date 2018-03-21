@@ -11,7 +11,6 @@ import akka.util.ByteString
 import nl.TextRecognition2
 import nl.ing.model._
 
-import scala.concurrent.Future
 import scala.io.StdIn
 
 object WebServer {
@@ -28,17 +27,9 @@ object WebServer {
           complete(
             HttpEntity(ContentTypes.`text/html(UTF-8)`,
                        "<h1>Say hello to akka-http</h1>"))
-        } ~
-          pathPrefix("item" / LongNumber) { id =>
-            // there might be no item for a given id
-            val maybeItem: Future[Option[Item]] = fetchItem(id)
-
-            onSuccess(maybeItem) {
-              case Some(item) => complete(item)
-              case None       => complete(StatusCodes.NotFound)
-            }
-          }
+        }
       } ~
+    //upload receipt endpoint.
         path("uploadReceipt") {
           fileUpload("receipt") {
             case (metadata, byteSource) =>
@@ -58,6 +49,7 @@ object WebServer {
               }
           }
         } ~
+    //get transactions endpoint.
         pathPrefix("getTransactions" / IntNumber / IntNumber) {
           case (offset, size) =>
             val eventualAccountOverview = fetchTransactions(offset, size)
