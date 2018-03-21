@@ -14,6 +14,7 @@ import akka.util.ByteString
 import scala.concurrent.Future
 import scala.io.StdIn
 import model._
+import nl.TextRecognition2
 
 import scala.util.{Failure, Success}
 
@@ -53,7 +54,7 @@ object WebServer {
               onSuccess(writeResult) { result =>
                 val listOfBytes = result.toList
 
-                TextRecognition.detectDocumentText(listOfBytes)
+                TextRecognition2.detectDocumentText(listOfBytes)
 
                 receipts = receipts :+ listOfBytes
 
