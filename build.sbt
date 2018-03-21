@@ -20,3 +20,5 @@ libraryDependencies ++= {
     "com.google.cloud" % "google-cloud-vision" % googleCloudVisionV
   )
 }
+
+enablePlugins(JavaServerAppPackaging)
