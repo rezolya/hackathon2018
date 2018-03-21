@@ -25,14 +25,17 @@ object WebServer {
     implicit val executionContext = system.dispatcher
 
     val route =
-      respondWithHeaders(headers.RawHeader("Access-Control-Allow-Origin", "*"),
+      respondWithHeaders(
+        headers.RawHeader("Access-Control-Allow-Origin", "*"),
         headers.RawHeader("Access-Control-Allow-Methods", "Get, POST"),
-        headers.RawHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")) {
+        headers.RawHeader("Access-Control-Allow-Headers",
+                          "Origin, X-Requested-With, Content-Type, Accept")
+      ) {
         get {
           path("hello") {
             complete(
               HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                "<h1>Say hello to akka-http</h1>"))
+                         "<h1>Say hello to akka-http</h1>"))
           }
         } ~
           //upload receipt endpoint.
@@ -52,20 +55,35 @@ object WebServer {
 
                   receipts = receipts :+ listOfBytes
 
-                  val stubbedReceipt = Receipt("AHTogo", 19.99F, List(Item("BonBons", 10.00F), Item("Appels", 5.00F), Item("Pepermunt ballen", 4.99F)))
+                  val stubbedReceipt =
+                    Receipt(
+                      "AHTogo",
+                      19.99F,
+                      List(
+                        Item("BonBons", 10.00F, ItemCategories.grosseries),
+                        Item("Appels", 5.00F, ItemCategories.grosseries),
+                        Item("Pepermunt ballen", 4.99F, ItemCategories.grosseries)
+                      ),
+                      Categories(grosseries = 90, toiletries = 10)
+                    )
+
+                  /*{"shopName":"AHTogo","totalTransactionAmount":19.989999771118164,
+                  "items":[{"name":"BonBons","price":10.0},{"name":"Appels","price":5.0,"category":"grocery"},{"name":"Pepermunt ballen","price":4.98,"category":"grocery"}]
+                  "category": {"grocery" : 10, "toiletries": 90}
+                }*/
                   complete(stubbedReceipt)
                 }
             }
           } ~
-            //get transactions endpoint.
-            pathPrefix("getTransactions" / IntNumber / IntNumber) {
-              case (offset, size) =>
-                val eventualAccountOverview = fetchTransactions(offset, size)
-                onSuccess(eventualAccountOverview) { accountOverview =>
-                  complete(accountOverview)
-                }
-            }
-        }
+          //get transactions endpoint.
+          pathPrefix("getTransactions" / IntNumber / IntNumber) {
+            case (offset, size) =>
+              val eventualAccountOverview = fetchTransactions(offset, size)
+              onSuccess(eventualAccountOverview) { accountOverview =>
+                complete(accountOverview)
+              }
+          }
+      }
 
     val bindingFuture = Http().bindAndHandle(route, "localhost", 8080)
 
