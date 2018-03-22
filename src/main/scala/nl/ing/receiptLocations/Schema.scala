@@ -68,13 +68,11 @@ case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLe
       case (true, false) =>
         val xUpper = otherSquare.upperLeft.x
         val xBottom = otherSquare.bottomLeft.x
-        val upperLine = getLineThroughPoints(upperLeft, upperRight).get
-        val bottomLine = getLineThroughPoints(bottomLeft, bottomRight).get
 
         if(xUpper == xBottom) {
           val lineThroughMiddle = getLineThroughPoint(middle, getSlope(bottomLeft, bottomRight).get)
 
-          Seq(upperLine, bottomLine, lineThroughMiddle).exists(line => {
+          Seq(lineThroughMiddle).exists(line => {
             val height = line.slope * xUpper + line.slope
 
             otherSquare.bottomLeft.y <= height && height <= otherSquare.upperLeft.y
@@ -85,7 +83,7 @@ case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLe
           val lineThroughMiddle = getLineThroughPoint(middle, getSlope(bottomLeft, bottomRight).get)
           val lineThroughLeftSideOfOtherRectangle = getLineThroughPoints(otherSquare.bottomLeft, otherSquare.upperLeft)
 
-          Seq(upperLine, bottomLine, lineThroughMiddle).exists(line => {
+          Seq(lineThroughMiddle).exists(line => {
             val intersection = line.intersection(lineThroughLeftSideOfOtherRectangle.get).get
 
             if(xUpper < xBottom) {
@@ -106,14 +104,16 @@ case class Item(name: String, coordinate: Rectangle)
 
 case class Schema(items : Seq[Item]) {
 
-  object ItemWidthOrdering extends Ordering[Item] {
-    override def compare(x: Item, y: Item): Int = x.coordinate.length compare y.coordinate.length
-  }
-
-  private def getBiggestOfTheFirstFive(items: Seq[Item]): (Item, Seq[Item]) = {
-    val subList = items.slice(0, Math.max(5, items.size))
-    val maxItem = subList.max(ItemWidthOrdering)
-    (maxItem, items.filterNot(_.equals(maxItem)))
+  private def sharesTheSameLine(targetItem: Item, otherItems: Seq[Item]): (Seq[Item], Seq[Item]) = {
+    var (itemsOnSameLine, remaining) = otherItems.partition(item => targetItem.coordinate.isOnSameHeight(item.coordinate))
+    for(newlyFoundItem <- itemsOnSameLine) {
+      val(newlyItemsOnSameLine, newlyRemaining) = remaining.partition(item => newlyFoundItem.coordinate.isOnSameHeight(item.coordinate))
+      if(newlyItemsOnSameLine.nonEmpty) {
+        itemsOnSameLine = itemsOnSameLine ++ newlyItemsOnSameLine
+        remaining = newlyRemaining
+      }
+    }
+    (itemsOnSameLine, remaining)
   }
 
   def getLines: Seq[Seq[Item]] = {
@@ -122,20 +122,17 @@ case class Schema(items : Seq[Item]) {
       itemList.toSeq match {
         case Nil =>
           Seq.empty
-        case seq: Seq[Item] =>
-          val (maxItem, rest): (Item, Seq[Item]) = getBiggestOfTheFirstFive(seq)
-          val (itemsOnSameLine, remaining): (Seq[Item], Seq[Item]) = rest.partition(item => maxItem.coordinate.isOnSameHeight(item.coordinate))
-          //val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
-          Seq(Seq(maxItem) ++ itemsOnSameLine) ++ innergetLines(remaining)
-        case vector: Vector[Item] =>
-          val (maxItem, rest): (Item, Seq[Item]) = getBiggestOfTheFirstFive(vector)
-          val (itemsOnSameLine, remaining): (Seq[Item], Seq[Item]) = rest.partition(item => maxItem.coordinate.isOnSameHeight(item.coordinate))
-          //val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
-          Seq(Seq(maxItem) ++ itemsOnSameLine) ++ innergetLines(remaining)
+        case head :: tail =>
+          val (itemsOnSameLine, remaining) = sharesTheSameLine(head, tail)
+          Seq(Seq(head) ++ itemsOnSameLine) ++ innergetLines(remaining)
+        case head +: tail =>
+          val (itemsOnSameLine, remaining) = sharesTheSameLine(head, tail)
+          Seq(head +: itemsOnSameLine) ++ innergetLines(remaining)
 
       }
     }
 
     innergetLines(items)
   }
+
 }

@@ -27,7 +27,7 @@ class AngleSpec extends WordSpecLike with Matchers  {
 
     "parse a ticket" in {
 
-      val stream = getClass.getResourceAsStream("/googleJsonExamples/intratuin-9113371798.txt")
+      val stream = getClass.getResourceAsStream("/googleJsonExamples/AH-9113371793.txt")
       val json = Source.fromInputStream(stream).mkString
 
       val schema = GoogleAnswerJsonParser.parse(json)
