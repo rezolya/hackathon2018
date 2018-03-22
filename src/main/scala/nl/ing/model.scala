@@ -2,7 +2,6 @@ package nl.ing
 
 import java.time.ZonedDateTime
 
-import nl.ing.model.ItemCategories.toiletries
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -20,9 +19,9 @@ object model {
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
         .toEpochMilli,
-      List(Item("Labello", 1.75F, toiletries),
-           Item("Shampoo", 3.3F, toiletries),
-           Item("Shower gel", 7F, toiletries)),
+      List(Item("Labello", 1.75F, "1", toiletries),
+           Item("Shampoo", 3.3F, "1", toiletries),
+           Item("Shower gel", 7F, "2", toiletries)),
       Categories(toiletries = 100)
     ),
     Transaction(Account("AH Togo", "5678"),
@@ -38,7 +37,8 @@ object model {
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
         .toEpochMilli,
-      List(Item("Shoes", 80.00F, clothes), Item("Scarf", 9.99F, clothes)),
+      List(Item("Shoes", 80.00F, "1", clothes),
+           Item("Scarf", 9.99F, "1", clothes)),
       Categories(clothes = 100)
     ),
     Transaction(Account("HurryUp", "5678"),
@@ -68,7 +68,10 @@ object model {
   ).sortBy(x => x.timestamp)
 
   // domain model
-  final case class Item(name: String, price: Float, category: String = "")
+  final case class Item(name: String,
+                        price: Float,
+                        quantity: String,
+                        category: String = "")
 
   final case class Receipt(shopName: String,
                            totalTransactionAmount: Float,
@@ -82,6 +85,32 @@ object model {
                               furniture: Int = 0,
                               toys: Int = 0)
 
+  final case class FoodGroups(vegetable: Double = 0,
+                              fruit: Double = 0,
+                              bread: Double = 0,
+                              grain: Double = 0,
+                              meat: Double = 0,
+                              nuts: Double = 0,
+                              dairy: Double = 0,
+                              cheese: Double = 0,
+                              fats: Double = 0,
+                              notAdvised: Double = 0)
+
+  final case class FoodGroupsResult(actual: FoodGroups,
+                                    advised: FoodGroups = advisedFoodGroups)
+
+  val advisedFoodGroups = FoodGroups(
+    vegetable = 16.39,
+    fruit = 13.11,
+    bread = 9.84,
+    grain = 19.67,
+    meat = 7.87,
+    nuts = 1.64,
+    dairy = 26.23,
+    cheese = 2.62,
+    fats = 2.62
+  )
+
   final case class Account(name: String, number: String)
 
   final case class Transaction(benificiary: Account,
@@ -94,18 +123,32 @@ object model {
                                    transactions: List[Transaction])
 
   // formats for unmarshalling and marshalling
-  implicit val itemFormat = jsonFormat3(Item)
+  implicit val itemFormat = jsonFormat4(Item)
   implicit val categoriesFormat = jsonFormat6(Categories)
   implicit val orderFormat = jsonFormat4(Receipt)
   implicit val accountFormat = jsonFormat2(Account)
   implicit val transactionFormat = jsonFormat5(Transaction)
   implicit val accountOverviewFormat = jsonFormat2(AccountOverview)
+  implicit val foodGroupsFormat = jsonFormat10(FoodGroups)
+  implicit val foodGroupsResultFormat = jsonFormat2(FoodGroupsResult)
 
   def fetchTransactions(offset: Int, size: Int)(
       implicit executionContext: ExecutionContext): Future[AccountOverview] =
     Future {
       AccountOverview(Account("Olga", "1234566"),
                       transactions.slice(offset, offset + size))
+    }
+
+  def fetchFoodGroupsResult(
+      implicit executionContext: ExecutionContext): Future[FoodGroupsResult] =
+    Future {
+      val actualFoodGroups = FoodGroups(
+        fruit = 7F,
+        bread = 9F,
+        meat = 19F,
+        notAdvised = 65F
+      )
+      FoodGroupsResult(actualFoodGroups)
     }
 
   object ItemCategories {
@@ -115,5 +158,18 @@ object model {
     val clothes = "clothes"
     val furniture = "furniture"
     val toys = "toys"
+  }
+
+  object FoodGroupsCategories {
+    val vegetable = "vegetable"
+    val fruit = "fruit"
+    val bread = "bread"
+    val grain = "grain"
+    val meat = "meat"
+    val nuts = "nuts"
+    val dairy = "dairy"
+    val cheese = "cheese"
+    val fats = "fats"
+    val notAdvised = "notAdvised"
   }
 }
