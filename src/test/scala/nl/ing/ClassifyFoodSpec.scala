@@ -35,6 +35,12 @@ class ClassifyFoodSpec extends WordSpecLike with Matchers  {
       println(dif)
     }
 
+    "load CSV file" in {
+      val details: Seq[ItemDetails] = ClassifyFood.ahDB
+      details.length should be > 10
+      details.foreach(println)
+    }
+
     "score name difference" in {
       val input = List(
         "AH APPEL" -> "ah appel",
