@@ -4,7 +4,7 @@ import nl.ing.model._
 
 object MatchReceipt {
 
-  final case class ScannedReceipt(items: List[Item], total: Double)
+  final case class ScannedReceipt(items: List[Item], total: Double, shopName: String)
 
   def catagorizeReceiptItems(items: List[Item]): List[Item] = {
     items.map { x =>

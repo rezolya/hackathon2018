@@ -1,12 +1,8 @@
 package nl.ing
 
-import java.io.InputStream
-
-import nl.ing.receiptLocations.{GoogleAnswerJsonParser, Item, Rectangle, Schema}
+import nl.ing.receiptLocations._
 import org.scalatest.{Matchers, WordSpecLike}
-import spray.json.JsValue
 
-import scala.collection.immutable
 import scala.io.Source
 
 class AngleSpec extends WordSpecLike with Matchers  {
@@ -33,6 +29,11 @@ class AngleSpec extends WordSpecLike with Matchers  {
       val schema = GoogleAnswerJsonParser.parse(json)
       val lines = schema.getLines.map(line => line.map(item => item.name))
       lines.foreach( line => println(line.mkString(" : ")))
+      println("****************************************")
+
+      val itemsExtractor = new ItemsExtractor(schema)
+      val receipt = itemsExtractor.getReceipt
+      val a = ""
     }
 
     "line up these two particular lines" in {

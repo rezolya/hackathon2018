@@ -1,6 +1,6 @@
 package nl.ing.receiptLocation
 
-import nl.ing.receiptLocations.{Item, Rectangle, Schema, Vec}
+import nl.ing.receiptLocations.{GoogleResponseItem, Rectangle, Schema, Vec}
 import org.scalatest.{Matchers, WordSpecLike}
 
 class SchemaSpec extends WordSpecLike with Matchers {
@@ -13,7 +13,7 @@ class SchemaSpec extends WordSpecLike with Matchers {
       rec2.isOnSameHeight(rec1) shouldBe true
       rec1.isOnSameHeight(rec1) shouldBe false
 
-      val a = Schema(Seq(Item("rec1", rec1), Item("rec2", rec2))).getLines
+      val a = Schema(Seq(GoogleResponseItem("rec1", rec1), GoogleResponseItem("rec2", rec2))).getLines
       val b = ""
 
     }
@@ -22,7 +22,7 @@ class SchemaSpec extends WordSpecLike with Matchers {
       val rec2 = Rectangle(Vec(10,1), Vec(12,1), Vec(11,3), Vec(9,2))
       rec1.isOnSameHeight(rec2) shouldBe false
       rec2.isOnSameHeight(rec1) shouldBe false
-      val a = Schema(Seq(Item("rec1", rec1), Item("rec2", rec2))).getLines
+      val a = Schema(Seq(GoogleResponseItem("rec1", rec1), GoogleResponseItem("rec2", rec2))).getLines
       val b = ""
 
     }

@@ -1,15 +1,13 @@
 package nl.ing
 
-import nl.ing.model.Transaction
-import model._
-import Math._
-import java.io.{BufferedWriter, File, FileWriter, InputStream}
+import java.io.InputStream
+import java.lang.Math._
 
-import nl.ing.model.ItemCategories.{grosseries, toiletries}
-import FoodGroupsCategories._
+import nl.ing.model.FoodGroupsCategories._
+import nl.ing.model.{Transaction, _}
 
-import scala.util.{Failure, Success, Try}
 import scala.io.Source
+import scala.util.{Failure, Success, Try}
 
 object ClassifyFood {
 
@@ -127,7 +125,7 @@ object ClassifyFood {
                                category: String = ItemCategories.grosseries) {
     def differenceScore(item: Item): Int = {
       compareNames(name, item.name) * 10 + comparePrices(price.toFloat,
-        item.price.toFloat)
+                                                         item.price.toFloat)
     }
 
     override def toString: String = s"$name\t$price\t$unitSize\t$foodCategory"

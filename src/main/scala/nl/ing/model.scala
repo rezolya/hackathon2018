@@ -2,7 +2,7 @@ package nl.ing
 
 import java.time.ZonedDateTime
 
-import nl.ing.model.ItemCategories.{grosseries, toiletries}
+import nl.ing.MatchReceipt.ScannedReceipt
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -111,7 +111,7 @@ object model {
 
   final case class Receipt(shopName: String,
                            totalTransactionAmount: Float,
-                           items: List[Item],
+                           items: Seq[Item],
                            categories: Categories)
 
   final case class Categories(grosseries: Int = 0,
@@ -167,6 +167,7 @@ object model {
   implicit val accountOverviewFormat = jsonFormat2(AccountOverview)
   implicit val foodGroupsFormat = jsonFormat10(FoodGroups)
   implicit val foodGroupsResultFormat = jsonFormat2(FoodGroupsResult)
+  implicit val scannedReceiptFormat = jsonFormat3(ScannedReceipt)
 
   def fetchTransactions(offset: Int, size: Int)(
       implicit executionContext: ExecutionContext): Future[AccountOverview] =
