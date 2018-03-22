@@ -69,11 +69,7 @@ object WebServer {
                       Categories(grosseries = 90, toiletries = 10)
                     )
 
-                  /*{"shopName":"AHTogo","totalTransactionAmount":19.989999771118164,
-                  "items":[{"name":"BonBons","price":10.0},{"name":"Appels","price":5.0,"category":"grocery"},{"name":"Pepermunt ballen","price":4.98,"category":"grocery"}]
-                  "category": {"grocery" : 10, "toiletries": 90}
-                }*/
-                  complete(stubbedReceipt)
+                  complete(StatusCodes.OK)
                 }
             }
           } ~
