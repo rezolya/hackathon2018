@@ -2,10 +2,12 @@ package nl.ing.receiptLocations
 
 import scala.io.Source
 
-class GoogleAnswerJsonParser {
+object GoogleAnswerJsonParser {
 
   def parse(json: String): Schema = {
     import spray.json._
+    def trimQuotes(input: String): String =
+      input.replaceAll("\"", "")
 
     val stream = getClass.getResourceAsStream("/Example.json")
     val json = Source.fromInputStream(stream).mkString
@@ -15,7 +17,7 @@ class GoogleAnswerJsonParser {
     val usefullJsonArray = jsonTextAnnotations.getFields("textAnnotations").head.asInstanceOf[JsArray].elements
     val items = usefullJsonArray.map(jsonValue => {
       val innerJsonObject = jsonValue.asJsObject()
-      val name = innerJsonObject.getFields("description").head.toString()
+      val name = trimQuotes(innerJsonObject.getFields("description").head.toString())
       val vertices = innerJsonObject.getFields("boundingPoly").head.asJsObject.getFields("vertices").head.asInstanceOf[JsArray]
       val corners = vertices.elements.map(element => {
         val x = element.asJsObject.getFields("x").head.asInstanceOf[JsNumber].value.toInt
@@ -24,7 +26,7 @@ class GoogleAnswerJsonParser {
       })
       val rectangle = Rectangle(corners(0), corners(1), corners(2), corners(3))
       Item(name, rectangle)
-    })
+    }).tail
     Schema(items)
   }
  // {

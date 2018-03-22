@@ -66,22 +66,32 @@ case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLe
       case (true, false) =>
         val xUpper = otherSquare.upperLeft.x
         val xBottom = otherSquare.bottomLeft.x
+        val upperLine = getLineThroughPoints(upperLeft, upperRight).get
+        val bottomLine = getLineThroughPoints(bottomLeft, bottomRight).get
+
         if(xUpper == xBottom) {
           val lineThroughMiddle = getLineThroughPoint(middle, getSlope(bottomLeft, bottomRight).get)
-          val height = lineThroughMiddle.slope * xUpper + lineThroughMiddle.slope
 
-          otherSquare.bottomLeft.y <= height && height <= otherSquare.upperLeft.y
+          Seq(upperLine, bottomLine, lineThroughMiddle).exists(line => {
+            val height = line.slope * xUpper + line.slope
+
+            otherSquare.bottomLeft.y <= height && height <= otherSquare.upperLeft.y
+
+          })
         } else {
 
           val lineThroughMiddle = getLineThroughPoint(middle, getSlope(bottomLeft, bottomRight).get)
           val lineThroughLeftSideOfOtherRectangle = getLineThroughPoints(otherSquare.bottomLeft, otherSquare.upperLeft)
-          val intersection = lineThroughMiddle.intersection(lineThroughLeftSideOfOtherRectangle.get).get
 
-          if(xUpper < xBottom) {
-            xUpper < intersection.x && intersection.x < xBottom
-          } else {
-            xBottom < intersection.x && intersection.x < xUpper
-          }
+          Seq(upperLine, bottomLine, lineThroughMiddle).exists(line => {
+            val intersection = line.intersection(lineThroughLeftSideOfOtherRectangle.get).get
+
+            if(xUpper < xBottom) {
+              xUpper <= intersection.x && intersection.x <= xBottom
+            } else {
+              xBottom <= intersection.x && intersection.x <= xUpper
+            }
+          })
         }
       case (false, true) =>
         otherSquare.isOnSameHeight(this)
