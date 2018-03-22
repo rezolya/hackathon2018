@@ -17,7 +17,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpV,
     "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpV,
     "org.scalatest" %% "scalatest" % scalaTestV % "test",
-    "com.google.cloud" % "google-cloud-vision" % googleCloudVisionV
+    "com.google.cloud" % "google-cloud-vision" % googleCloudVisionV,
+    "org.parboiled" %% "parboiled" % "2.1.4"
   )
 }
 
