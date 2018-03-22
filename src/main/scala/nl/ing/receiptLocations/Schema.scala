@@ -1,5 +1,7 @@
 package nl.ing.receiptLocations
 
+import scala.annotation.tailrec
+
 object Vec {
   def apply(x: Int, y: Int): Vec = {
     Vec(x.toDouble, y.toDouble)
@@ -90,4 +92,23 @@ case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLe
 }
 case class Item(name: String, coordinate: Rectangle)
 
-case class Schema(item : Seq[Item])
+case class Schema(items : Seq[Item]) {
+  def getLines: Seq[Seq[Item]] = {
+
+    def innergetLines(itemList: Seq[Item]): Seq[Seq[Item]] = {
+      itemList.toSeq match {
+        case Nil =>
+          Seq.empty
+        case head :: tail =>
+          val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
+          Seq(head :: itemsOnSameLine) ++ innergetLines(remaining)
+        case head +: tail =>
+          val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
+          Seq(head +: itemsOnSameLine) ++ innergetLines(remaining)
+
+      }
+    }
+
+    innergetLines(items)
+  }
+}

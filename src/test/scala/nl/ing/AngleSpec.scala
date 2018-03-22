@@ -2,7 +2,7 @@ package nl.ing
 
 import java.io.InputStream
 
-import nl.ing.receiptLocations.{Item, Rectangle}
+import nl.ing.receiptLocations.{Item, Rectangle, Schema}
 import org.scalatest.{Matchers, WordSpecLike}
 import spray.json.JsValue
 
@@ -26,6 +26,10 @@ class AngleSpec extends WordSpecLike with Matchers  {
     }
 
     "do some shit" in {
+
+      def trimQuotes(input: String): String =
+        input.replaceAll("\"", "")
+
       import spray.json._
 
       val stream = getClass.getResourceAsStream("/Example.json")
@@ -34,9 +38,9 @@ class AngleSpec extends WordSpecLike with Matchers  {
       val jsonObject = json.asJson.asJsObject
       val jsonTextAnnotations = jsonObject.getFields("responses").head.asInstanceOf[JsArray].elements.head.asJsObject
       val usefullJsonArray = jsonTextAnnotations.getFields("textAnnotations").head.asInstanceOf[JsArray].elements
-      val items = usefullJsonArray.map(jsonValue => {
+      val items : Seq[Item] = usefullJsonArray.map(jsonValue => {
         val innerJsonObject = jsonValue.asJsObject()
-        val name = innerJsonObject.getFields("description").head.toString()
+        val name = trimQuotes(innerJsonObject.getFields("description").head.toString())
         val vertices = innerJsonObject.getFields("boundingPoly").head.asJsObject.getFields("vertices").head.asInstanceOf[JsArray]
         val corners = vertices.elements.map(element => {
           val x = element.asJsObject.getFields("x").head.asInstanceOf[JsNumber].value.toInt
@@ -45,7 +49,13 @@ class AngleSpec extends WordSpecLike with Matchers  {
         })
         val rectangle = Rectangle(corners(0), corners(1), corners(2), corners(3))
         Item(name, rectangle)
-      })
+      }).tail
+
+      val lines = Schema(items).getLines.map(line => line.map(item => item.name))
+      lines.foreach( line => println(line.mkString(" : ")))
+    }
+
+    "blub" in {
     }
   }
 }
