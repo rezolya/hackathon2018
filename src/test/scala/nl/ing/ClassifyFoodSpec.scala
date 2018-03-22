@@ -11,7 +11,8 @@ class ClassifyFoodSpec extends WordSpecLike with Matchers  {
   "the food classifier" should {
 
     "classify" in {
-      ClassifyFood.classifyFood(model.transactions)
+      val result = ClassifyFood.classifyFood(model.transactions)
+      println(result)
     }
 
     "find details" in {
@@ -38,7 +39,9 @@ class ClassifyFoodSpec extends WordSpecLike with Matchers  {
     "load CSV file" in {
       val details: Seq[ItemDetails] = ClassifyFood.ahDB
       details.length should be > 10
-      details.foreach(println)
+//      details.foreach(println)
+
+      details.map(_.foodCategory).distinct.foreach(println)
     }
 
     "score name difference" in {
