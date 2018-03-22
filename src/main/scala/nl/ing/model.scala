@@ -51,7 +51,7 @@ object model {
     ),
     Transaction(
       Account("AH Togo", "5678"),
-      -0.75,
+      -1.5,
       ZonedDateTime
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
