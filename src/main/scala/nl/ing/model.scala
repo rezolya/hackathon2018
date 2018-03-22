@@ -27,7 +27,7 @@ object model {
     Item("KIPFILET", 2.6F, "0.127kg", grosseries)
   )
 
-  val transactions: List[Transaction] = List(
+  var transactions: List[Transaction] = List(
     Transaction(
       Account("Etos", "1234"),
       -12.05,
@@ -35,9 +35,9 @@ object model {
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
         .toEpochMilli,
-      List(Item("Labello", 1.75F, "1", toiletries),
-           Item("Shampoo", 3.3F, "1", toiletries),
-           Item("Shower gel", 7F, "2", toiletries)),
+      List(Item("Labello", 1.75, "1", toiletries),
+           Item("Shampoo", 3.3, "1", toiletries),
+           Item("Shower gel", 7, "2", toiletries)),
       Categories(toiletries = 100)
     ),
     Transaction(
@@ -48,11 +48,11 @@ object model {
         .toInstant
         .toEpochMilli,
       List(
-        Item("APPEL", 0.75F, "1", grosseries),
-        Item("LABELLO", 1.75F, "1", toiletries),
-        Item("OET PIZZA", 5.3F, "2", grosseries),
-        Item("YAKITORI", 3.59F, "1", grosseries),
-        Item("DR PEPPER", 0.69F, "1", grosseries)
+        Item("APPEL", 0.75, "1", grosseries),
+        Item("LABELLO", 1.75, "1", toiletries),
+        Item("OET PIZZA", 5.3, "2", grosseries),
+        Item("YAKITORI", 3.59, "1", grosseries),
+        Item("DR PEPPER", 0.69, "1", grosseries)
       ),
       Categories(toiletries = 14, grosseries = 86)
     ),
@@ -63,8 +63,8 @@ object model {
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
         .toEpochMilli,
-      List(Item("Shoes", 80.00F, "1", clothes),
-           Item("Scarf", 9.99F, "1", clothes)),
+      List(Item("Shoes", 80.00, "1", clothes),
+           Item("Scarf", 9.99, "1", clothes)),
       Categories(clothes = 100)
     ),
     Transaction(Account("HurryUp", "5678"),
@@ -80,12 +80,12 @@ object model {
           .toInstant
           .toEpochMilli,
       List(
-        Item("FUET SPANJE", 2.29F, "1", grosseries),
-        Item("VARKENSFILET", 2.98F, "0.298kg", grosseries),
-        Item("RED BULL", 1.25F, "1", grosseries),
-        Item("PASTASALADE", 9.38F, "2", grosseries),
-        Item("AH BOLLEN", 1F, "1", grosseries),
-        Item("KIPFILET", 2.6F, "0.127kg", grosseries)
+        Item("FUET SPANJE", 2.29, "1", grosseries),
+        Item("VARKENSFILET", 2.98, "0.298kg", grosseries),
+        Item("RED BULL", 1.25, "1", grosseries),
+        Item("PASTASALADE", 9.38, "2", grosseries),
+        Item("AH BOLLEN", 1, "1", grosseries),
+        Item("KIPFILET", 2.6, "0.127kg", grosseries)
       ),
       Categories(grosseries = 100)
     ),
@@ -111,7 +111,7 @@ object model {
 
   // domain model
   final case class Item(name: String,
-                        price: Float,
+                        price: Double,
                         quantity: String,
                         category: String = "")
 
