@@ -61,7 +61,7 @@ object ReceiptRecognition {
         .flatMap{
       //.onComplete {
         case res =>
-          println(res)
+//          println(res)
           val eventualString: Future[String] = Unmarshal(res.entity).to[String]
           eventualString.map(_ match {
             case jsonString =>

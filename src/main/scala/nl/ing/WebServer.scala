@@ -54,8 +54,7 @@ object WebServer {
                   onSuccess(googleResponse){
                     case Success(receipt) =>
                       MatchReceipt.matchReceipt(receipt)
-
-                      complete(StatusCodes.OK)
+                      complete(receipt)
                   }
                 }
             }
