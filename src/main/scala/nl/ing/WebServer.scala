@@ -14,6 +14,8 @@ import nl.ing.model._
 import scala.concurrent.Future
 import scala.io.StdIn
 import scala.util.Success
+import scala.concurrent.duration._
+
 
 object WebServer {
 
@@ -38,8 +40,7 @@ object WebServer {
           }
         } ~
           //upload receipt endpoint.
-          path("uploadReceipt") {
-
+          path("uploadReceipt") { withRequestTimeout(40.seconds){
             fileUpload("receipt") {
               case (metadata, byteSource) =>
                 //                val sink = FileIO.toPath(Paths.get("/tmp") resolve metadata.fileName)
@@ -59,6 +60,7 @@ object WebServer {
                   }
                 }
             }
+          }
           } ~
           //get transactions endpoint.
           pathPrefix("getTransactions" / IntNumber / IntNumber) {
