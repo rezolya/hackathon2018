@@ -177,7 +177,7 @@ object model {
   def fetchTransactions(offset: Int, size: Int)(
       implicit executionContext: ExecutionContext): Future[AccountOverview] =
     Future {
-      AccountOverview(Account("Olga", "1234566"),
+      AccountOverview(Account("Mw OA Someone", "NL99 1234 5678 90"),
                       transactions.slice(offset, offset + size))
     }
 
