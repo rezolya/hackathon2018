@@ -57,12 +57,12 @@ object WebServer {
                   val stubbedReceipt =
                     Receipt(
                       "AHTogo",
-                      "19.99",
+                      19.99F,
                       List(
-                        Item("BonBons", "10.00", "1", ItemCategories.grosseries),
-                        Item("Appels", "5.00", "1", ItemCategories.grosseries),
+                        Item("BonBons", 10.00, "1", ItemCategories.grosseries),
+                        Item("Appels", 5.00, "1", ItemCategories.grosseries),
                         Item("Pepermunt ballen",
-                          "4.99",
+                             4.99,
                              "1",
                              ItemCategories.grosseries)
                       ),
