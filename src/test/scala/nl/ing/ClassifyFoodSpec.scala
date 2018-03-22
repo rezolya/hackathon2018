@@ -1,9 +1,11 @@
 package nl.ing
 
 import nl.ing.ClassifyFood.ItemDetails
+import nl.ing.MatchReceipt.ScannedReceipt
 import nl.ing.model.Item
 import nl.ing.model.ItemCategories.grosseries
 import org.scalatest.{Matchers, WordSpecLike}
+
 
 class ClassifyFoodSpec extends WordSpecLike with Matchers  {
 
@@ -11,7 +13,7 @@ class ClassifyFoodSpec extends WordSpecLike with Matchers  {
   "the food classifier" should {
 
     "classify" in {
-      val result = ClassifyFood.classifyFood(model.transactions)
+      val result = ClassifyFood.summerizeFoodGroups(model.transactions)
       println(result)
     }
 

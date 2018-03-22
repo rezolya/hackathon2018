@@ -3,20 +3,19 @@ package nl.ing
 import nl.ing.model.Transaction
 import model._
 import Math._
-import java.io.InputStream
+import java.io.{BufferedWriter, File, FileWriter, InputStream}
 
 import nl.ing.model.ItemCategories.{grosseries, toiletries}
 import FoodGroupsCategories._
 
 import scala.util.{Failure, Success, Try}
-
 import scala.io.Source
 
 object ClassifyFood {
 
   final case class FoodItem(item: Item, grams: Int, foodCategory: String)
 
-  def classifyFood(transactions: List[Transaction]): FoodGroups = {
+  def summerizeFoodGroups(transactions: List[Transaction]): FoodGroups = {
     val itemsToClassify = transactions
         .flatMap(_.items)
         .filter(_.category == ItemCategories.grosseries)
@@ -130,6 +129,8 @@ object ClassifyFood {
       compareNames(name, item.name) * 10 + comparePrices(price.toFloat,
         item.price.toFloat)
     }
+
+    override def toString: String = s"$name\t$price\t$unitSize\t$foodCategory"
   }
 
   object ItemDetails {

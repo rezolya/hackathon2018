@@ -47,13 +47,7 @@ object model {
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
         .toEpochMilli,
-      List(
-        Item("APPEL", 0.75, "1", grosseries),
-        Item("LABELLO", 1.75, "1", toiletries),
-        Item("OET PIZZA", 5.3, "2", grosseries),
-        Item("YAKITORI", 3.59, "1", grosseries),
-        Item("DR PEPPER", 0.69, "1", grosseries)
-      ),
+      List.empty,
       Categories(toiletries = 14, grosseries = 86)
     ),
     Transaction(
@@ -200,6 +194,7 @@ object model {
     val clothes = "clothes"
     val furniture = "furniture"
     val toys = "toys"
+    val unspecified = "unspecified"
   }
 
   object FoodGroupsCategories {
