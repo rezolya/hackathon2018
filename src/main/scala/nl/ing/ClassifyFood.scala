@@ -35,7 +35,23 @@ object ClassifyFood {
 
     val totalGrams = validFoodItems.map(_.grams).sum
 
+//    val vegetable =
+//    val fruit =
+//    val bread =
+//    val grain =
+//    val meat =
+//    val nuts =
+//    val dairy =
+//    val cheese =
+//    val fats =
+//    val notAdvised =
+//    val unknown =
+
     FoodGroups()
+  }
+
+  def getCategorySum(list: List[FoodItem], category: String): Int = {
+    list.filter(_.foodCategory == category).map(_.grams).sum
   }
 
   //Left(amount), Right(grams)
@@ -105,7 +121,22 @@ object ClassifyFood {
         val strings: Array[String] = line.split('\t')
         strings match {
           case Array(name, category, price, unit) =>
-            Some(ItemDetails(name.replace("\u00AD","").intern(), price.toDouble, convertUnit(unit), category.intern()))
+            val foodCategory = category.replace("\u00AD","").intern() match {
+              case s if s.startsWith("Aardappel, groente, fruit".replace("\u00AD","")) => vegetable
+              case s if s.startsWith("Vlees, kip, vis,".replace("\u00AD","")) => meat
+              case s if s.startsWith("Vlees, kip, vis,".replace("\u00AD","")) => meat
+              case s if s.contains("Brood".replace("\u00AD","")) => bread
+              case s if s.startsWith("Pasta, rijst, ".replace("\u00AD","")) => grain
+              case s if s.contains("Zuivel".replace("\u00AD","")) => dairy
+              case s if s.startsWith("Zuivel, eieren ".replace("\u00AD","")) => dairy
+              case s if s.startsWith("Kaas, vleeswaren, delicatessen".replace("\u00AD","")) => cheese
+              case s if s.startsWith("Verse kant-en-klaar maaltijden".replace("\u00AD","")) => notAdvised
+              case s if s.startsWith("Soepen, conserven, sauzen,".replace("\u00AD","")) => notAdvised
+              case s if s.contains("Snoep".replace("\u00AD","")) => notAdvised
+              case s => s
+            }
+
+            Some(ItemDetails(name.replace("\u00AD","").intern(), price.toDouble, convertUnit(unit), foodCategory))
           case _ =>
             None
         }
