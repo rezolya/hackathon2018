@@ -24,7 +24,9 @@ object model {
     Item("RED BULL", 1.25F, "1", grosseries),
     Item("PASTASALADE", 9.38F, "2", grosseries),
     Item("AH BOLLEN", 1F, "1", grosseries),
-    Item("KIPFILET", 2.6F, "0.127kg", grosseries)
+    Item("KIPFILET", 2.6F, "0.127kg", grosseries),
+    Item("AH B0LLEN", 1F, "1", grosseries),
+    Item("0,127kg KIPFILET", 2.6F, "0.127kg", grosseries)
   )
 
   var transactions: List[Transaction] = List(
