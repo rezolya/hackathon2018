@@ -105,7 +105,7 @@ object ClassifyFood {
         val strings: Array[String] = line.split('\t')
         strings match {
           case Array(name, category, price, unit) =>
-            Some(ItemDetails(name.intern(), price.toDouble, convertUnit(unit), category.intern()))
+            Some(ItemDetails(name.replace("\u00AD","").intern(), price.toDouble, convertUnit(unit), category.intern()))
           case _ =>
             None
         }
