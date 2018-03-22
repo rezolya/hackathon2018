@@ -42,13 +42,21 @@ object model {
     ),
     Transaction(
       Account("AH Togo", "5678"),
-      -12.08,
+      -12.98,
       ZonedDateTime
         .parse("2018-03-21T10:30:00.00+01:00")
         .toInstant
         .toEpochMilli,
-      List.empty,
-      Categories(toiletries = 14, grosseries = 86)
+      List.empty
+    ),
+    Transaction(
+      Account("AH Togo", "5678"),
+      -0.75,
+      ZonedDateTime
+        .parse("2018-03-21T10:30:00.00+01:00")
+        .toInstant
+        .toEpochMilli,
+      List.empty
     ),
     Transaction(
       Account("Yari", "5678"),

@@ -29,7 +29,7 @@ class ItemsExtractor(schema: Schema) {
     val totalAmount = getTotalAmount
     val itemsBought = getItems()
 
-    ScannedReceipt(itemsBought.map(boughtItem => Item(getItemName(boughtItem), getLargestAmount(boughtItem), "1", "")).toList, totalAmount, shopName)
+    ScannedReceipt(itemsBought.map(boughtItem => Item(getItemName(boughtItem), getLargestAmount(boughtItem).toDouble, "1", "")).toList, totalAmount.toDouble, shopName)
   }
 
   private def amountToFloat(amount: String): Float = {
@@ -74,7 +74,7 @@ class ItemsExtractor(schema: Schema) {
 
   private def getTotalAmount = {
     val linesWithTotalAmount: Seq[Seq[String]] = lines.filter(line => line.exists(item => contains(item, "subtotaa")))
-    amountToFloat(linesWithTotalAmount.filter(_.exists(isAnAmount(_))).head.filter(isAnAmount(_)).head)
+    (amountToFloat(linesWithTotalAmount.filter(_.exists(isAnAmount(_))).head.filter(isAnAmount(_)).head)*100).toInt.toDouble/100
   }
 
   private def getShopName = {

@@ -1,6 +1,7 @@
 package nl.ing
 
 import nl.ing.model._
+import Math._
 
 object MatchReceipt {
 
@@ -17,7 +18,9 @@ object MatchReceipt {
   }
 
   def matchReceipt(scannedReceipt: ScannedReceipt): Unit = {
-    transactions.find(x => x.amount == scannedReceipt.total) match {
+    transactions.find{x =>
+      abs(x.amount) == scannedReceipt.total
+    } match {
       case Some(transaction) =>
         val items: List[model.Item] = catagorizeReceiptItems(scannedReceipt.items)
         val categoriesWeights: Map[String, Int] = items
