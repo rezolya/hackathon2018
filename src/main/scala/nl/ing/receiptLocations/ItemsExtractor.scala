@@ -1,7 +1,7 @@
 package nl.ing.receiptLocations
 
 import nl.ing.MatchReceipt.ScannedReceipt
-import nl.ing.model.{Categories, Item}
+import nl.ing.model.Item
 
 class ItemsExtractor(schema: Schema) {
   val lines = schema.getLines.map(_.map(_.name))

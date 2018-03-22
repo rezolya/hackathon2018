@@ -3,7 +3,6 @@ package nl.ing
 import java.time.ZonedDateTime
 
 import nl.ing.MatchReceipt.ScannedReceipt
-import nl.ing.model.ItemCategories.{grosseries, toiletries}
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.{ExecutionContext, Future}

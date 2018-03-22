@@ -1,8 +1,8 @@
 package nl.ing
 
 import nl.ing.MatchReceipt.ScannedReceipt
-import nl.ing.model.{Categories, Item}
 import nl.ing.model.ItemCategories.{grosseries, toiletries}
+import nl.ing.model.{Categories, Item}
 import org.scalatest.{Inside, Matchers, WordSpecLike}
 
 class MatchReceiptSpec extends WordSpecLike with Matchers with Inside {

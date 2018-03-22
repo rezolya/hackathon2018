@@ -1,12 +1,8 @@
 package nl.ing
 
-import java.io.InputStream
-
 import nl.ing.receiptLocations._
 import org.scalatest.{Matchers, WordSpecLike}
-import spray.json.JsValue
 
-import scala.collection.immutable
 import scala.io.Source
 
 class AngleSpec extends WordSpecLike with Matchers  {
