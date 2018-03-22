@@ -54,6 +54,8 @@ case class Line(slope: Double, height: Double) {
 
 case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLeft: Vec) {
 
+  lazy val length: Double = bottomRight.x - bottomLeft.x
+
   import Line._
   lazy val middle: Vec = getLineThroughPoints(bottomLeft, upperRight).get.intersection(getLineThroughPoints(bottomRight, upperLeft).get).get
 
@@ -103,18 +105,33 @@ case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLe
 case class Item(name: String, coordinate: Rectangle)
 
 case class Schema(items : Seq[Item]) {
+
+  object ItemWidthOrdering extends Ordering[Item] {
+    override def compare(x: Item, y: Item): Int = x.coordinate.length compare y.coordinate.length
+  }
+
+  private def getBiggestOfTheFirstFive(items: Seq[Item]): (Item, Seq[Item]) = {
+    val subList = items.slice(0, Math.max(5, items.size))
+    val maxItem = subList.max(ItemWidthOrdering)
+    (maxItem, items.filterNot(_.equals(maxItem)))
+  }
+
   def getLines: Seq[Seq[Item]] = {
 
     def innergetLines(itemList: Seq[Item]): Seq[Seq[Item]] = {
       itemList.toSeq match {
         case Nil =>
           Seq.empty
-        case head :: tail =>
-          val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
-          Seq(head :: itemsOnSameLine) ++ innergetLines(remaining)
-        case head +: tail =>
-          val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
-          Seq(head +: itemsOnSameLine) ++ innergetLines(remaining)
+        case seq: Seq[Item] =>
+          val (maxItem, rest): (Item, Seq[Item]) = getBiggestOfTheFirstFive(seq)
+          val (itemsOnSameLine, remaining): (Seq[Item], Seq[Item]) = rest.partition(item => maxItem.coordinate.isOnSameHeight(item.coordinate))
+          //val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
+          Seq(Seq(maxItem) ++ itemsOnSameLine) ++ innergetLines(remaining)
+        case vector: Vector[Item] =>
+          val (maxItem, rest): (Item, Seq[Item]) = getBiggestOfTheFirstFive(vector)
+          val (itemsOnSameLine, remaining): (Seq[Item], Seq[Item]) = rest.partition(item => maxItem.coordinate.isOnSameHeight(item.coordinate))
+          //val (itemsOnSameLine, remaining) = tail.partition(item => head.coordinate.isOnSameHeight(item.coordinate))
+          Seq(Seq(maxItem) ++ itemsOnSameLine) ++ innergetLines(remaining)
 
       }
     }
