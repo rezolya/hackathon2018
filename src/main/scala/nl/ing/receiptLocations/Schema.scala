@@ -1,28 +1,34 @@
 package nl.ing.receiptLocations
 
-case class Vector(x: Double, y: Double)
+object Vec {
+  def apply(x: Int, y: Int): Vec = {
+    Vec(x.toDouble, y.toDouble)
+  }
+}
+
+case class Vec(x: Double, y: Double)
 
 object Line {
 
-  def getSlope(point1: Vector, point2: Vector): Option[Double] = {
+  def getSlope(point1: Vec, point2: Vec): Option[Double] = {
     if(point1.x == point2.x) None
     else if(point1.x < point2.x) {
       val xDifference = point2.x - point1.x
       val yDifference = point2.y - point1.y
-      yDifference / xDifference
+      Some(yDifference / xDifference)
     } else {
       val xDifference = point1.x - point2.x
       val yDifference = point1.y - point2.y
-      yDifference / xDifference
+      Some(yDifference / xDifference)
     }
   }
 
-  def getLineThroughPoint(point: Vector, slope: Double): Line = {
+  def getLineThroughPoint(point: Vec, slope: Double): Line = {
     val height = point.y - (slope * point.x)
     Line(slope, height)
   }
 
-  def getLineThroughPoints(point1: Vector, point2: Vector): Option[Line] = {
+  def getLineThroughPoints(point1: Vec, point2: Vec): Option[Line] = {
     getSlope(point1, point2) match {
       case None =>
         None
@@ -34,20 +40,20 @@ object Line {
 }
 
 case class Line(slope: Double, height: Double) {
-  def intersection(otherLine: Line): Option[Vector] = {
+  def intersection(otherLine: Line): Option[Vec] = {
     if(otherLine.slope == slope) None
     else {
       val x = (otherLine.height - height)/(slope - otherLine.slope)
       val y = slope * x + height
-      Some(Vector(x, y))
+      Some(Vec(x, y))
     }
   }
 }
 
-case class Rectangle(bottomLeft: Vector, bottomRight: Vector, upperRight: Vector, upperLeft: Vector) {
+case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLeft: Vec) {
 
   import Line._
-  lazy val middle: Vector = getLineThroughPoints(bottomLeft, upperRight).get.intersection(getLineThroughPoints(bottomRight, upperLeft).get).get
+  lazy val middle: Vec = getLineThroughPoints(bottomLeft, upperRight).get.intersection(getLineThroughPoints(bottomRight, upperLeft).get).get
 
   def isToTheLeftOf (otherSquare: Rectangle): Boolean = {
     Math.max(bottomRight.x, upperRight.x) <= Math.min(otherSquare.bottomLeft.x, otherSquare.upperLeft.x)

@@ -41,7 +41,7 @@ class AngleSpec extends WordSpecLike with Matchers  {
         val corners = vertices.elements.map(element => {
           val x = element.asJsObject.getFields("x").head.asInstanceOf[JsNumber].value.toInt
           val y = element.asJsObject.getFields("y").head.asInstanceOf[JsNumber].value.toInt
-          nl.ing.receiptLocations.Vector(x, y)
+          nl.ing.receiptLocations.Vec(x, y)
         })
         val rectangle = Rectangle(corners(0), corners(1), corners(2), corners(3))
         Item(name, rectangle)
