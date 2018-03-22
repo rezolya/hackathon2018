@@ -22,7 +22,7 @@ object model {
     Item("FUET SPANJE", 2.29F, "1", grosseries),
     Item("VARKENSFILET", 2.98F, "0.298kg", grosseries),
     Item("RED BULL", 1.25F, "1", grosseries),
-    Item("PASTASALADE", 9.38F, "2", grosseries),
+    Item("PASTASALADE", 9.38F, "1100 gr", grosseries),
     Item("AH BOLLEN", 1F, "1", grosseries),
     Item("KIPFILET", 2.6F, "0.127kg", grosseries),
     Item("AH B0LLEN", 1F, "1", grosseries),
@@ -76,13 +76,14 @@ object model {
                 ZonedDateTime
                   .parse("2018-03-21T10:30:00.00+01:00")
                   .toInstant
-                  .toEpochMilli),    Transaction(
+                  .toEpochMilli),
+    Transaction(
       Account("Albert Hein", "5678"),
       -19.5,
       ZonedDateTime
-          .parse("2018-03-21T10:30:00.00+01:00")
-          .toInstant
-          .toEpochMilli,
+        .parse("2018-03-21T10:30:00.00+01:00")
+        .toInstant
+        .toEpochMilli,
       List(
         Item("FUET SPANJE", 2.29, "1", grosseries),
         Item("VARKENSFILET", 2.98, "0.298kg", grosseries),
@@ -189,12 +190,7 @@ object model {
   def fetchFoodGroupsResult(
       implicit executionContext: ExecutionContext): Future[FoodGroupsResult] =
     Future {
-      val actualFoodGroups = FoodGroups(
-        fruit = 7F,
-        bread = 9F,
-        meat = 19F,
-        notAdvised = 65F
-      )
+      val actualFoodGroups = ClassifyFood.summerizeFoodGroups(model.transactions)
       FoodGroupsResult(actualFoodGroups)
     }
 

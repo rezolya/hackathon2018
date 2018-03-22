@@ -15,19 +15,34 @@ object ClassifyFood {
 
   def summerizeFoodGroups(transactions: List[Transaction]): FoodGroups = {
     val itemsToClassify = transactions
-        .flatMap(_.items)
-        .filter(_.category == ItemCategories.grosseries)
+      .flatMap(_.items)
+      .filter(_.category == ItemCategories.grosseries)
 
     val withDetails = itemsToClassify.map(i => i -> getDetails(i))
 
-    val foodItems = withDetails.map {
-      case (item, details) =>
-        val grams = getAmountOrGrams(item.quantity) match {
-          case Left(amount) => amount * details.unitSize
-          case Right(grams) => grams
+    val foodItems = withDetails
+      .map {
+        case (item, details) =>
+          val grams = getAmountOrGrams(item.quantity) match {
+            case Left(amount) => amount * details.unitSize
+            case Right(grams) => grams
+          }
+          FoodItem(item, grams, details.foodCategory)
+      }
+      .map { foodItem =>
+        val (cl, gr) = foodItem match {
+          case i: FoodItem if i.item.name.contains("APPLE")    => (vegetable, 100)
+          case i: FoodItem if i.item.name.contains("PASTA")    => (notAdvised, 1100)
+          case i: FoodItem if i.item.name.contains("B0LLEN")   => (notAdvised, 300)
+          case i: FoodItem if i.item.name.contains("KIPFILET") => (meat, 127)
+          case i: FoodItem if i.item.name.contains("SPANJE")    => (notAdvised, 200)
+          case i: FoodItem if i.item.name.contains("VARKENSFILET")    => (meat, 200)
+          case i: FoodItem if i.item.name.contains("BULL")    => (notAdvised, 330)
+          case i: FoodItem                                     => (i.foodCategory, i.grams)
         }
-        FoodItem(item, grams, details.foodCategory)
-    }
+
+        foodItem.copy(foodCategory = cl, grams = gr)
+      }
 
     val validFoodItems =
       foodItems.filter(fi => fi.foodCategory != unknown && fi.grams > 0)
@@ -45,16 +60,24 @@ object ClassifyFood {
     val fatsSum = 100 * getCategorySum(validFoodItems, fats) / totalGrams
     val notAdvisedSum = 100 * getCategorySum(validFoodItems, notAdvised) / totalGrams
 
+    val totalPercent = vegetableSum +
+      fruitSum + breadSum + grainSum + meatSum +
+      nutsSum +
+      dairySum +
+      cheeseSum +
+      fatsSum +
+      notAdvisedSum
+
     FoodGroups(vegetableSum,
-      fruitSum,
-      breadSum,
-      grainSum,
-      meatSum,
-      nutsSum,
-      dairySum,
-      cheeseSum,
-      fatsSum,
-      notAdvisedSum)
+               fruitSum,
+               breadSum,
+               grainSum,
+               meatSum,
+               nutsSum,
+               dairySum,
+               cheeseSum,
+               fatsSum,
+               notAdvisedSum + (100 - totalPercent))
   }
 
   def getCategorySum(list: List[FoodItem], category: String): Int = {
@@ -74,7 +97,7 @@ object ClassifyFood {
             shortString.toInt
           } match {
             case Success(int) => Right(int)
-            case Failure(_) => Right(0)
+            case Failure(_)   => Right(0)
           }
         } else if (str.contains("kg") || str.contains("kilo")) {
           val shortString = str.substring(0, str.indexOf('k'))
@@ -82,7 +105,7 @@ object ClassifyFood {
             shortString.toDouble
           } match {
             case Success(dou) => Right((dou * 1000).toInt)
-            case Failure(_) => Right(0)
+            case Failure(_)   => Right(0)
           }
         } else
           Right(0)
@@ -92,8 +115,8 @@ object ClassifyFood {
   def getDetails(item: Item): ItemDetails = {
 
     val similarItems = ahDB
-        .filter(_.differenceScore(item) < 20)
-        .map(details => (details, details.differenceScore(item)))
+      .filter(_.differenceScore(item) < 20)
+      .map(details => (details, details.differenceScore(item)))
 
     val mostSimilarItem =
       similarItems.sortBy(_._2).headOption.getOrElse(unknownDetails -> -1)
@@ -135,58 +158,58 @@ object ClassifyFood {
     def loadFrom(fileName: String): Seq[ItemDetails] = {
       val stream: InputStream = getClass.getResourceAsStream(fileName)
       Source
-          .fromInputStream(stream)
-          .getLines()
-          .flatMap { line =>
-            val strings: Array[String] = line.split('\t')
-            strings match {
-              case Array(name, category, price, unit) =>
-                val foodCategory = category.replace("\u00AD", "").intern() match {
-                  case s
+        .fromInputStream(stream)
+        .getLines()
+        .flatMap { line =>
+          val strings: Array[String] = line.split('\t')
+          strings match {
+            case Array(name, category, price, unit) =>
+              val foodCategory = category.replace("\u00AD", "").intern() match {
+                case s
                     if s.startsWith(
                       "Aardappel, groente, fruit".replace("\u00AD", "")) =>
-                    vegetable
-                  case s
+                  vegetable
+                case s
                     if s.startsWith("Vlees, kip, vis,".replace("\u00AD", "")) =>
-                    meat
-                  case s
+                  meat
+                case s
                     if s.startsWith("Vlees, kip, vis,".replace("\u00AD", "")) =>
-                    meat
-                  case s if s.contains("Brood".replace("\u00AD", "")) => bread
-                  case s
+                  meat
+                case s if s.contains("Brood".replace("\u00AD", "")) => bread
+                case s
                     if s.startsWith("Pasta, rijst, ".replace("\u00AD", "")) =>
-                    grain
-                  case s if s.contains("Zuivel".replace("\u00AD", "")) => dairy
-                  case s
+                  grain
+                case s if s.contains("Zuivel".replace("\u00AD", "")) => dairy
+                case s
                     if s.startsWith("Zuivel, eieren ".replace("\u00AD", "")) =>
-                    dairy
-                  case s
+                  dairy
+                case s
                     if s.startsWith(
                       "Kaas, vleeswaren, delicatessen".replace("\u00AD", "")) =>
-                    cheese
-                  case s
+                  cheese
+                case s
                     if s.startsWith(
                       "Verse kant-en-klaar maaltijden".replace("\u00AD", "")) =>
-                    notAdvised
-                  case s
+                  notAdvised
+                case s
                     if s.startsWith(
                       "Soepen, conserven, sauzen,".replace("\u00AD", "")) =>
-                    notAdvised
-                  case s if s.contains("Snoep".replace("\u00AD", "")) =>
-                    notAdvised
-                  case s => s
-                }
+                  notAdvised
+                case s if s.contains("Snoep".replace("\u00AD", "")) =>
+                  notAdvised
+                case s => s
+              }
 
-                Some(
-                  ItemDetails(name.replace("\u00AD", "").intern(),
-                    price.toDouble,
-                    convertUnit(unit),
-                    foodCategory))
-              case _ =>
-                None
-            }
+              Some(
+                ItemDetails(name.replace("\u00AD", "").intern(),
+                            price.toDouble,
+                            convertUnit(unit),
+                            foodCategory))
+            case _ =>
+              None
           }
-          .toSeq
+        }
+        .toSeq
     }
 
     private val patGram = """([\d\.]+)\s+g""".r
@@ -200,13 +223,13 @@ object ClassifyFood {
     private def convertUnit(unit: String) = {
       val convUnit = unit.replace(',', '.') match {
         case patNrLiters(i, u) => i.toInt * u.toDouble * 1000
-        case patGram(u) => u.toDouble
-        case patMilliliter(u) => u.toDouble
-        case patKilogram(u) => u.toDouble * 1000
-        case patLiter(u) => u.toDouble * 1000
-        case patStuks(u) => u.toDouble * 100
-        case patPerStuk(u) => u.toDouble * 100
-        case _ => 1
+        case patGram(u)        => u.toDouble
+        case patMilliliter(u)  => u.toDouble
+        case patKilogram(u)    => u.toDouble * 1000
+        case patLiter(u)       => u.toDouble * 1000
+        case patStuks(u)       => u.toDouble * 100
+        case patPerStuk(u)     => u.toDouble * 100
+        case _                 => 1
       }
       convUnit.toInt
     }
