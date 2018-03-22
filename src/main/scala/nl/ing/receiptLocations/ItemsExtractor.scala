@@ -31,6 +31,13 @@ class ItemsExtractor(schema: Schema) {
     Receipt(shopName, totalAmount, itemsBought.map(boughtItem => Item(getItemName(boughtItem), getLargestAmount(boughtItem), "1", "")), new Categories())
   }
 
+  private def amountToFloat(amount: String): Float = {
+    amount match{
+      case amountRegex(euro, cents) =>
+        euro.toFloat + cents.toFloat/100
+    }
+  }
+
   private def getItemName(item: Seq[String]): String = {
     item.filterNot(value => isAnAmount(value)).mkString(" ")
   }
@@ -46,7 +53,7 @@ class ItemsExtractor(schema: Schema) {
     else x._1 compare x._1
   }
 
-  private def getLargestAmount(item: Seq[String]): String = {
+  private def getLargestAmount(item: Seq[String]): Float = {
     val amountInIntPairs: Seq[(Int, Int)] = item.flatMap {
       case amountRegex(euro, cents) =>
         Some((euro.toString.toInt, cents.toString.toInt))
@@ -54,7 +61,7 @@ class ItemsExtractor(schema: Schema) {
         None
     }
     val minAmount = amountInIntPairs.min(amountOrdering)
-    s"${minAmount._1},${minAmount._2}"
+    minAmount._1.toFloat+minAmount._2.toFloat/100
 
   }
 
@@ -66,7 +73,7 @@ class ItemsExtractor(schema: Schema) {
 
   private def getTotalAmount = {
     val linesWithTotalAmount: Seq[Seq[String]] = lines.filter(line => line.exists(item => contains(item, "subtotaa")))
-    linesWithTotalAmount.filter(_.exists(isAnAmount(_))).head.filter(isAnAmount(_)).head
+    amountToFloat(linesWithTotalAmount.filter(_.exists(isAnAmount(_))).head.filter(isAnAmount(_)).head)
   }
 
   private def getShopName = {

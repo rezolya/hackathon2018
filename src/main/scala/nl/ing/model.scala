@@ -116,7 +116,7 @@ object model {
                         category: String = "")
 
   final case class Receipt(shopName: String,
-                           totalTransactionAmount: String,
+                           totalTransactionAmount: Float,
                            items: Seq[Item],
                            categories: Categories)
 
