@@ -27,7 +27,7 @@ class AngleSpec extends WordSpecLike with Matchers  {
 
     "parse a ticket" in {
 
-      val stream = getClass.getResourceAsStream("/Example.json")
+      val stream = getClass.getResourceAsStream("/googleJsonExamples/intratuin-9113371798.txt")
       val json = Source.fromInputStream(stream).mkString
 
       val schema = GoogleAnswerJsonParser.parse(json)
@@ -36,12 +36,12 @@ class AngleSpec extends WordSpecLike with Matchers  {
     }
 
     "line up these two particular lines" in {
-      val stream = getClass.getResourceAsStream("/Example.json")
+      val stream = getClass.getResourceAsStream("/googleJsonExamples/AH-9113371797.txt")
       val json = Source.fromInputStream(stream).mkString
 
       val schema = GoogleAnswerJsonParser.parse(json)
-      val itemSubtotaal = schema.items.filter(item => item.name == "SUBTOTAA").head
-      val item150 = schema.items.filter(_.name == "1,50").head
+      val itemSubtotaal = schema.items.filter(item => item.name == "SUBTOTAAL").head
+      val item150 = schema.items.filter(_.name == "3,").head
       itemSubtotaal.coordinate.isOnSameHeight(item150.coordinate)
     }
   }

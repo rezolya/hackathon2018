@@ -9,9 +9,6 @@ object GoogleAnswerJsonParser {
     def trimQuotes(input: String): String =
       input.replaceAll("\"", "")
 
-    val stream = getClass.getResourceAsStream("/Example.json")
-    val json = Source.fromInputStream(stream).mkString
-
     val jsonObject = json.asJson.asJsObject
     val jsonTextAnnotations = jsonObject.getFields("responses").head.asInstanceOf[JsArray].elements.head.asJsObject
     val usefullJsonArray = jsonTextAnnotations.getFields("textAnnotations").head.asInstanceOf[JsArray].elements
