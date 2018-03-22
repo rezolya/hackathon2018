@@ -1,6 +1,7 @@
 package nl.ing.receiptLocations
 
-import nl.ing.model.{Categories, Item, Receipt}
+import nl.ing.MatchReceipt.ScannedReceipt
+import nl.ing.model.{Categories, Item}
 
 class ItemsExtractor(schema: Schema) {
   val lines = schema.getLines.map(_.map(_.name))
@@ -22,13 +23,13 @@ class ItemsExtractor(schema: Schema) {
   private def isSameAs(a: String, b: String): Boolean = a.toLowerCase equals b.toLowerCase
   private def contains(superString: String, subString: String): Boolean = getAllSubstrings(superString).exists(sub => isSameAs(sub, subString))
 
-  def getReceipt: Receipt = {
+  def getReceipt: ScannedReceipt = {
     val shopName = getShopName
 
     val totalAmount = getTotalAmount
     val itemsBought = getItems()
 
-    Receipt(shopName, totalAmount, itemsBought.map(boughtItem => Item(getItemName(boughtItem), getLargestAmount(boughtItem), "1", "")), new Categories())
+    ScannedReceipt(itemsBought.map(boughtItem => Item(getItemName(boughtItem), getLargestAmount(boughtItem), "1", "")).toList, totalAmount, shopName)
   }
 
   private def amountToFloat(amount: String): Float = {

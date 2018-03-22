@@ -2,6 +2,7 @@ package nl.ing
 
 import java.time.ZonedDateTime
 
+import nl.ing.MatchReceipt.ScannedReceipt
 import nl.ing.model.ItemCategories.{grosseries, toiletries}
 import spray.json.DefaultJsonProtocol._
 
@@ -167,6 +168,7 @@ object model {
   implicit val accountOverviewFormat = jsonFormat2(AccountOverview)
   implicit val foodGroupsFormat = jsonFormat10(FoodGroups)
   implicit val foodGroupsResultFormat = jsonFormat2(FoodGroupsResult)
+  implicit val scannedReceiptFormat = jsonFormat3(ScannedReceipt)
 
   def fetchTransactions(offset: Int, size: Int)(
       implicit executionContext: ExecutionContext): Future[AccountOverview] =
