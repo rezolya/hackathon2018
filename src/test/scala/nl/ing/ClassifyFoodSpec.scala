@@ -11,7 +11,8 @@ class ClassifyFoodSpec extends WordSpecLike with Matchers  {
   "the food classifier" should {
 
     "classify" in {
-      ClassifyFood.classifyFood(model.transactions)
+      val result = ClassifyFood.classifyFood(model.transactions)
+      println(result)
     }
 
     "find details" in {
