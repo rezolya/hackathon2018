@@ -33,9 +33,8 @@ object WebServer {
       ) {
         get {
           path("hello") {
-            complete(
-              HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                         "<h1>Say hello to akka-http</h1>"))
+            complete(HttpEntity(ContentTypes.`text/html(UTF-8)`,
+                                "<h1>Say hello to akka-http</h1>"))
           }
         } ~
           //upload receipt endpoint.
@@ -60,9 +59,12 @@ object WebServer {
                       "AHTogo",
                       19.99F,
                       List(
-                        Item("BonBons", 10.00F, ItemCategories.grosseries),
-                        Item("Appels", 5.00F, ItemCategories.grosseries),
-                        Item("Pepermunt ballen", 4.99F, ItemCategories.grosseries)
+                        Item("BonBons", 10.00F, "1", ItemCategories.grosseries),
+                        Item("Appels", 5.00F, "1", ItemCategories.grosseries),
+                        Item("Pepermunt ballen",
+                             4.99F,
+                             "1",
+                             ItemCategories.grosseries)
                       ),
                       Categories(grosseries = 90, toiletries = 10)
                     )
@@ -82,6 +84,12 @@ object WebServer {
               onSuccess(eventualAccountOverview) { accountOverview =>
                 complete(accountOverview)
               }
+          } ~
+          pathPrefix("getFoodGroups") {
+            val eventualResult = fetchFoodGroupsResult
+            onSuccess(eventualResult) { result =>
+              complete(result)
+            }
           }
       }
 
