@@ -2,6 +2,7 @@ package nl.ing
 
 import java.time.ZonedDateTime
 
+import nl.ing.model.ItemCategories.{grosseries, toiletries}
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -10,6 +11,21 @@ object model {
 
   var receipts: List[Seq[Byte]] = List.empty
   import ItemCategories._
+
+  val someItems = List(
+    Item("AH APPEL", 0.75F, "1", grosseries),
+    Item("APPEL", 0.75F, "1", grosseries),
+    Item("LABELLO", 1.75F, "1", toiletries),
+    Item("OET PIZZA", 5.3F, "2", grosseries),
+    Item("YAKITORI", 3.59F, "1", grosseries),
+    Item("DR PEPPER", 0.69F, "1", grosseries),
+    Item("FUET SPANJE", 2.29F, "1", grosseries),
+    Item("VARKENSFILET", 2.98F, "0.298kg", grosseries),
+    Item("RED BULL", 1.25F, "1", grosseries),
+    Item("PASTASALADE", 9.38F, "2", grosseries),
+    Item("AH BOLLEN", 1F, "1", grosseries),
+    Item("KIPFILET", 2.6F, "0.127kg", grosseries)
+  )
 
   val transactions: List[Transaction] = List(
     Transaction(
@@ -24,12 +40,22 @@ object model {
            Item("Shower gel", 7F, "2", toiletries)),
       Categories(toiletries = 100)
     ),
-    Transaction(Account("AH Togo", "5678"),
-                -32.05,
-                ZonedDateTime
-                  .parse("2018-03-21T10:30:00.00+01:00")
-                  .toInstant
-                  .toEpochMilli),
+    Transaction(
+      Account("AH Togo", "5678"),
+      -12.08,
+      ZonedDateTime
+        .parse("2018-03-21T10:30:00.00+01:00")
+        .toInstant
+        .toEpochMilli,
+      List(
+        Item("APPEL", 0.75F, "1", grosseries),
+        Item("LABELLO", 1.75F, "1", toiletries),
+        Item("OET PIZZA", 5.3F, "2", grosseries),
+        Item("YAKITORI", 3.59F, "1", grosseries),
+        Item("DR PEPPER", 0.69F, "1", grosseries)
+      ),
+      Categories(toiletries = 14, grosseries = 86)
+    ),
     Transaction(
       Account("Yari", "5678"),
       -89.99,
@@ -46,7 +72,23 @@ object model {
                 ZonedDateTime
                   .parse("2018-03-21T10:30:00.00+01:00")
                   .toInstant
-                  .toEpochMilli),
+                  .toEpochMilli),    Transaction(
+      Account("Albert Hein", "5678"),
+      -19.5,
+      ZonedDateTime
+          .parse("2018-03-21T10:30:00.00+01:00")
+          .toInstant
+          .toEpochMilli,
+      List(
+        Item("FUET SPANJE", 2.29F, "1", grosseries),
+        Item("VARKENSFILET", 2.98F, "0.298kg", grosseries),
+        Item("RED BULL", 1.25F, "1", grosseries),
+        Item("PASTASALADE", 9.38F, "2", grosseries),
+        Item("AH BOLLEN", 1F, "1", grosseries),
+        Item("KIPFILET", 2.6F, "0.127kg", grosseries)
+      ),
+      Categories(grosseries = 100)
+    ),
     Transaction(Account("Bristol", "5678"),
                 -32.05,
                 ZonedDateTime
@@ -171,5 +213,6 @@ object model {
     val cheese = "cheese"
     val fats = "fats"
     val notAdvised = "notAdvised"
+    val unknown = "unknown"
   }
 }
