@@ -7,11 +7,13 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.Materializer
+import nl.ing.MatchReceipt.ScannedReceipt
+import nl.ing.receiptLocations.{GoogleAnswerJsonParser, ItemsExtractor, Schema}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
-object TextRecognition2 {
+object ReceiptRecognition {
 
   val apiKey = "AIzaSyCweUb0_GyA8WQ2vIH3_pXPNgxBSyGJGvo"
 
@@ -30,7 +32,7 @@ object TextRecognition2 {
   def detectDocumentText(imageBytes: Seq[Byte])(
       implicit actorSystem: ActorSystem,
       executionContext: ExecutionContext,
-      materializer: Materializer): Unit = {
+      materializer: Materializer): Future[Success[ScannedReceipt]] = {
     val base64Image = Try(Base64.getEncoder.encodeToString(imageBytes.toArray))
 
     val json = s"""{
@@ -56,12 +58,16 @@ object TextRecognition2 {
       ))
 
     responseFuture
-      .onComplete {
-        case Success(res) =>
+        .flatMap{
+      //.onComplete {
+        case res =>
           println(res)
-          val eventualString = Unmarshal(res.entity).to[String]
-          eventualString.onComplete(println)
-        case Failure(_) => sys.error("something wrong")
+          val eventualString: Future[String] = Unmarshal(res.entity).to[String]
+          eventualString.map(_ match {
+            case jsonString =>
+              val parsedSchema: Schema = GoogleAnswerJsonParser.parse(jsonString)
+              Success(new ItemsExtractor(parsedSchema).getReceipt)
+          })
       }
   }
 }

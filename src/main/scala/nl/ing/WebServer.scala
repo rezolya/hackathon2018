@@ -8,10 +8,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import akka.util.ByteString
-import nl.TextRecognition2
+import nl.ReceiptRecognition
 import nl.ing.model._
 
+import scala.concurrent.Future
 import scala.io.StdIn
+import scala.util.Success
 
 object WebServer {
 
@@ -48,26 +50,13 @@ object WebServer {
                 onSuccess(writeResult) { result =>
                   val listOfBytes = result.toList
 
-                  TextRecognition2.detectDocumentText(listOfBytes)
+                  val googleResponse: Future[Success[MatchReceipt.ScannedReceipt]] = ReceiptRecognition.detectDocumentText(listOfBytes)
+                  onSuccess(googleResponse){
+                    case Success(receipt) =>
+                      MatchReceipt.matchReceipt(receipt)
 
-                  receipts = receipts :+ listOfBytes
-
-                  val stubbedReceipt =
-                    Receipt(
-                      "AHTogo",
-                      19.99F,
-                      List(
-                        Item("BonBons", 10.00, "1", ItemCategories.grosseries),
-                        Item("Appels", 5.00, "1", ItemCategories.grosseries),
-                        Item("Pepermunt ballen",
-                             4.99,
-                             "1",
-                             ItemCategories.grosseries)
-                      ),
-                      Categories(grosseries = 90, toiletries = 10)
-                    )
-
-                  complete(StatusCodes.OK)
+                      complete(StatusCodes.OK)
+                  }
                 }
             }
           } ~
