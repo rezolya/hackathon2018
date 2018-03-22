@@ -110,7 +110,7 @@ object ClassifyFood {
                                foodCategory: String) {
     def differenceScore(item: Item): Int = {
       compareNames(name, item.name) * 10 + comparePrices(price.toFloat,
-                                                         item.price)
+                                                         item.price.toFloat)
     }
   }
 

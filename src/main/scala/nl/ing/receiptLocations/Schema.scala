@@ -1,7 +1,5 @@
 package nl.ing.receiptLocations
 
-import scala.annotation.tailrec
-
 object Vec {
   def apply(x: Int, y: Int): Vec = {
     Vec(x.toDouble, y.toDouble)
@@ -100,11 +98,11 @@ case class Rectangle(bottomLeft: Vec, bottomRight: Vec, upperRight: Vec, upperLe
     }
   }
 }
-case class Item(name: String, coordinate: Rectangle)
+case class GoogleResponseItem(name: String, coordinate: Rectangle)
 
-case class Schema(items : Seq[Item]) {
+case class Schema(items : Seq[GoogleResponseItem]) {
 
-  private def sharesTheSameLine(targetItem: Item, otherItems: Seq[Item]): (Seq[Item], Seq[Item]) = {
+  private def sharesTheSameLine(targetItem: GoogleResponseItem, otherItems: Seq[GoogleResponseItem]): (Seq[GoogleResponseItem], Seq[GoogleResponseItem]) = {
     var (itemsOnSameLine, remaining) = otherItems.partition(item => targetItem.coordinate.isOnSameHeight(item.coordinate))
     for(newlyFoundItem <- itemsOnSameLine) {
       val(newlyItemsOnSameLine, newlyRemaining) = remaining.partition(item => newlyFoundItem.coordinate.isOnSameHeight(item.coordinate))
@@ -116,9 +114,9 @@ case class Schema(items : Seq[Item]) {
     (itemsOnSameLine, remaining)
   }
 
-  def getLines: Seq[Seq[Item]] = {
+  def getLines: Seq[Seq[GoogleResponseItem]] = {
 
-    def innergetLines(itemList: Seq[Item]): Seq[Seq[Item]] = {
+    def innergetLines(itemList: Seq[GoogleResponseItem]): Seq[Seq[GoogleResponseItem]] = {
       itemList.toSeq match {
         case Nil =>
           Seq.empty

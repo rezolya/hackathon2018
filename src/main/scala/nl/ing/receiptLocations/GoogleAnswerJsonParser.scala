@@ -22,20 +22,9 @@ object GoogleAnswerJsonParser {
         nl.ing.receiptLocations.Vec(x, y)
       })
       val rectangle = Rectangle(corners(0), corners(1), corners(2), corners(3))
-      Item(name, rectangle)
+      GoogleResponseItem(name, rectangle)
     }).tail
     Schema(items)
   }
- // {
-//    import spray.json._
-//    val jsonObject = json.asJson.asJsObject
-//    val usefullJsonArray: immutable.Seq[JsValue] = jsonObject.getFields("responses").head.asJsObject().getFields("textAnnotations")
-//    val items = usefullJsonArray.map(jsonValue => {
-//      val jsonObject = jsonValue.asJsObject()
-//      val name = jsonObject.getFields("description").head.toString()
-//      val vertices = jsonObject.getFields("boundingPoly").head.asJsObject.getFields("vertices")
-//    })
-//    Schema(items)
-//  }
 
 }
